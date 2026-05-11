@@ -3,23 +3,28 @@ const { exec } = pkg;
 
 export const searchSongs = async (query) => {
   try {
-    const results = await exec(`ytsearch15:${query}`, {
+    // Improved search syntax for better reliability
+    const results = await exec(`ytsearch15:"${query}"`, {
       dumpSingleJson: true,
       noPlaylist: true,
       flatPlaylist: true,
       format: 'bestaudio'
     });
     
-    return (results.entries || []).map(entry => ({
-      id: entry.id,
-      title: entry.title,
-      artist: entry.uploader,
-      thumbnail: `https://i.ytimg.com/vi/${entry.id}/hqdefault.jpg`,
+    const entries = results.entries || [];
+    
+    // Map entries with safety checks
+    return entries.map(entry => ({
+      id: entry.id || '',
+      title: entry.title || 'Unknown Title',
+      artist: entry.uploader || 'Unknown Artist',
+      thumbnail: entry.id ? `https://i.ytimg.com/vi/${entry.id}/hqdefault.jpg` : '',
       duration: entry.duration_string || '0:00',
       durationSeconds: entry.duration || 0
-    }));
+    })).filter(song => song.id !== ''); // Filter out invalid entries
+    
   } catch (error) {
-    console.error('Search error:', error);
+    console.error('Search service error:', error);
     return [];
   }
 };
