@@ -1,4 +1,5 @@
-import { exec } from 'yt-dlp-exec';
+import pkg from 'yt-dlp-exec';
+const { exec } = pkg;
 
 export const searchSongs = async (query) => {
   try {
